@@ -1,0 +1,10 @@
+log-level: info
+dir: "./test/mocks"
+filename: "{{.InterfaceName}}.go"
+packages:
+  github.com/pusrenk/customer-service/internal/customers/repositories:
+    config:
+      all: true
+  github.com/pusrenk/customer-service/internal/customers/services:
+    config:
+      all: true
