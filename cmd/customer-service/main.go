@@ -36,23 +36,23 @@ func main() {
 	}()
 
 	// inti grpc server
-    grpcServer := grpc.NewServer()
+	grpcServer := grpc.NewServer()
 
 	// init customers
-    customerRepository := repositories.NewCustomerRepository(db)
-    customerService := services.NewCustomerService(customerRepository)
+	customerRepository := repositories.NewCustomerRepository(db)
+	customerService := services.NewCustomerService(customerRepository)
 	customerServer := rpc.NewCustomerServiceServer(customerService)
 
 	// register customers
-    models.RegisterCustomerServiceServer(grpcServer, customerServer)
-    
-    // start server
-    lis, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.App.GRPCPort))
+	models.RegisterCustomerServiceServer(grpcServer, customerServer)
+
+	// start server
+	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.App.GRPCPort))
 	log.Infof("server is running on port %d", cfg.App.GRPCPort)
-    if err != nil {
-        log.Fatalf("failed to listen: %v", err)
-    }
-    if err := grpcServer.Serve(lis); err != nil {
-        log.Fatalf("failed to serve: %v", err)
-    }
+	if err != nil {
+		log.Fatalf("failed to listen: %v", err)
+	}
+	if err := grpcServer.Serve(lis); err != nil {
+		log.Fatalf("failed to serve: %v", err)
+	}
 }

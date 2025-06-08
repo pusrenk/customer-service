@@ -167,10 +167,10 @@ func (s *CustomerServiceServerTestSuite) TestGetCustomer() {
 			mockSetup: func() {
 				s.mockService.EXPECT().GetCustomerByID(uint(1)).
 					Return(&entitites.Customer{
-						ID: 1,
-						Name: "John Doe",
-						Email: "john@example.com",
-						Phone: "+1234567890",
+						ID:        1,
+						Name:      "John Doe",
+						Email:     "john@example.com",
+						Phone:     "+1234567890",
 						CreatedAt: now,
 						UpdatedAt: now,
 						CreatedBy: "system",
@@ -258,16 +258,16 @@ func (s *CustomerServiceServerTestSuite) TestListCustomers() {
 		validate      func(*testing.T, *models.ListCustomersResponse)
 	}{
 		{
-			name: "success list customers",
+			name:    "success list customers",
 			request: &models.ListCustomersRequest{},
 			mockSetup: func() {
 				s.mockService.EXPECT().GetAllCustomers().
 					Return([]*entitites.Customer{
 						{
-							ID: 1,
-							Name: "John Doe",
-							Email: "john@example.com",
-							Phone: "+1234567890",
+							ID:        1,
+							Name:      "John Doe",
+							Email:     "john@example.com",
+							Phone:     "+1234567890",
 							CreatedAt: now,
 							UpdatedAt: now,
 							CreatedBy: "system",
@@ -291,7 +291,7 @@ func (s *CustomerServiceServerTestSuite) TestListCustomers() {
 			},
 		},
 		{
-			name: "service error",
+			name:    "service error",
 			request: &models.ListCustomersRequest{},
 			mockSetup: func() {
 				s.mockService.EXPECT().GetAllCustomers().
@@ -335,19 +335,19 @@ func (s *CustomerServiceServerTestSuite) TestUpdateCustomer() {
 		{
 			name: "success update customer",
 			request: &models.UpdateCustomerRequest{
-				Id: 1,
-				Name: "John Doe",
-				Email: "john@example.com",
-				Phone: "+1234567890",
+				Id:        1,
+				Name:      "John Doe",
+				Email:     "john@example.com",
+				Phone:     "+1234567890",
 				UpdatedBy: "system",
 			},
 			mockSetup: func() {
 				s.mockService.EXPECT().GetCustomerByID(uint(1)).
 					Return(&entitites.Customer{
-						ID: 1,
-						Name: "John Doe",
-						Email: "john@example.com",
-						Phone: "+1234567890",
+						ID:        1,
+						Name:      "John Doe",
+						Email:     "john@example.com",
+						Phone:     "+1234567890",
 						CreatedAt: now,
 						UpdatedAt: now,
 						CreatedBy: "system",
@@ -382,9 +382,9 @@ func (s *CustomerServiceServerTestSuite) TestUpdateCustomer() {
 		{
 			name: "missing name",
 			request: &models.UpdateCustomerRequest{
-				Id: 1,
-				Email: "john@example.com",
-				Phone: "+1234567890",
+				Id:        1,
+				Email:     "john@example.com",
+				Phone:     "+1234567890",
 				UpdatedBy: "system",
 			},
 			mockSetup:     func() {},
@@ -394,9 +394,9 @@ func (s *CustomerServiceServerTestSuite) TestUpdateCustomer() {
 		{
 			name: "missing email",
 			request: &models.UpdateCustomerRequest{
-				Id: 1,
-				Name: "John Doe",
-				Phone: "+1234567890",
+				Id:        1,
+				Name:      "John Doe",
+				Phone:     "+1234567890",
 				UpdatedBy: "system",
 			},
 			mockSetup:     func() {},
@@ -406,9 +406,9 @@ func (s *CustomerServiceServerTestSuite) TestUpdateCustomer() {
 		{
 			name: "missing phone",
 			request: &models.UpdateCustomerRequest{
-				Id: 1,
-				Name: "John Doe",
-				Email: "john@example.com",
+				Id:        1,
+				Name:      "John Doe",
+				Email:     "john@example.com",
 				UpdatedBy: "system",
 			},
 			mockSetup:     func() {},
@@ -418,8 +418,8 @@ func (s *CustomerServiceServerTestSuite) TestUpdateCustomer() {
 		{
 			name: "missing updated_by",
 			request: &models.UpdateCustomerRequest{
-				Id: 1,
-				Name: "John Doe",
+				Id:    1,
+				Name:  "John Doe",
 				Email: "john@example.com",
 				Phone: "+1234567890",
 			},
@@ -430,10 +430,10 @@ func (s *CustomerServiceServerTestSuite) TestUpdateCustomer() {
 		{
 			name: "customer not found",
 			request: &models.UpdateCustomerRequest{
-				Id: 1,
-				Name: "John Doe",
-				Email: "john@example.com",
-				Phone: "+1234567890",
+				Id:        1,
+				Name:      "John Doe",
+				Email:     "john@example.com",
+				Phone:     "+1234567890",
 				UpdatedBy: "system",
 			},
 			mockSetup: func() {
@@ -446,10 +446,10 @@ func (s *CustomerServiceServerTestSuite) TestUpdateCustomer() {
 		{
 			name: "get customer by id error",
 			request: &models.UpdateCustomerRequest{
-				Id: 1,
-				Name: "John Doe",
-				Email: "john@example.com",
-				Phone: "+1234567890",
+				Id:        1,
+				Name:      "John Doe",
+				Email:     "john@example.com",
+				Phone:     "+1234567890",
 				UpdatedBy: "system",
 			},
 			mockSetup: func() {
@@ -462,10 +462,10 @@ func (s *CustomerServiceServerTestSuite) TestUpdateCustomer() {
 		{
 			name: "update customer error",
 			request: &models.UpdateCustomerRequest{
-				Id: 1,
-				Name: "John Doe",
-				Email: "john@example.com",
-				Phone: "+1234567890",
+				Id:        1,
+				Name:      "John Doe",
+				Email:     "john@example.com",
+				Phone:     "+1234567890",
 				UpdatedBy: "system",
 			},
 			mockSetup: func() {
