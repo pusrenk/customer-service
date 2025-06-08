@@ -12,25 +12,22 @@ A lightning-fast, production-ready customer service API built with Go. Designed 
 
 ## ✨ Features
 
-- ⚡ **High Performance**: Built with Echo framework for blazing-fast response times
+- ⚡ **High Performance**: Built with gRPC for blazing-fast response times
 - 🔒 **Secure**: Built-in security best practices and middleware
 - 📊 **Structured Logging**: Comprehensive logging with Zap
 - 🔄 **Database Ready**: PostgreSQL with GORM for efficient data management
 - ⚙️ **Configurable**: Flexible configuration management with Viper
-- 📝 **API Documentation**: Auto-generated Swagger documentation with swaggo
 - 🧪 **Test Coverage**: Comprehensive test suite with mockery for mocking
-- 🔍 **API Testing**: Easy API testing with Swagger UI
 
 ## 🛠️ Tech Stack
 
 | Component | Technology | Description |
 |-----------|------------|-------------|
-| Framework | [Echo](https://echo.labstack.com/) | High performance, minimalist Go web framework |
-| Database | PostgreSQL | Advanced open source database |
+| Framework | [gRPC](https://grpc.io/) | High performance, minimalist Go web framework |
+| Database | [PostgreSQL](https://www.postgresql.org/) | Advanced open source database |
 | ORM | [GORM](https://gorm.io/) | The fantastic ORM library for Golang |
 | Logger | [Zap](https://github.com/uber-go/zap) | Blazing fast, structured, leveled logging |
 | Config | [Viper](https://github.com/spf13/viper) | Complete configuration solution |
-| Swagger | [swaggo/swag](https://github.com/swaggo/swag) | Auto Swagger documentation generator |
 | Testing | [mockery](https://github.com/vektra/mockery) | Mock generation for Go interfaces |
 
 ## 📋 Prerequisites
@@ -39,7 +36,6 @@ A lightning-fast, production-ready customer service API built with Go. Designed 
 - PostgreSQL
 - Make (for using Makefile commands)
 - golangci-lint (for linting)
-- swag (for Swagger documentation)
 - mockery (for generating mocks)
 
 ## 🚀 Quick Start
@@ -51,9 +47,6 @@ cd customer-service
 
 # Install dependencies
 make deps
-
-# Generate Swagger documentation
-make swagger
 
 # Generate mocks
 make mocks
@@ -70,9 +63,8 @@ make run
 ├── cmd/            # Application entry points
 ├── configs/        # Configuration files
 ├── database/       # Database related code
-├── log/           # Logging related code
-├── docs/          # Swagger documentation
-└── mocks/         # Generated mocks for testing
+├── log/            # Logging related code
+└── test/           # Generated mocks for testing
 ```
 
 ## 🛠️ Available Commands
@@ -87,31 +79,8 @@ make run
 | `make fmt` | Format code |
 | `make deps` | Download dependencies |
 | `make tidy` | Tidy dependencies |
-| `make swagger` | Generate Swagger documentation |
 | `make mocks` | Generate mocks for testing |
 | `make help` | Show all available commands |
-
-## 📚 API Documentation
-
-The API documentation is automatically generated using swaggo/swag. To view the documentation:
-
-1. Generate the Swagger documentation:
-   ```bash
-   make swagger
-   ```
-
-2. Start the application:
-   ```bash
-   make run
-   ```
-
-3. Access the Swagger UI at: `http://localhost:8080/swagger/index.html`
-
-The documentation includes:
-- Detailed API endpoints
-- Request/Response schemas
-- Authentication requirements
-- Example requests and responses
 
 ## 🧪 Testing
 

@@ -4,13 +4,12 @@ MAIN_PATH=./cmd/customer-service/main.go
 GO=go
 GOFMT=gofmt
 GOLINT=golangci-lint
-SWAG=swag
 MOCKERY=mockery
 
 # Build flags
 LDFLAGS=-ldflags "-s -w"
 
-.PHONY: all build clean test coverage lint fmt help swagger mocks upgrade-deps proto
+.PHONY: all build clean test coverage lint fmt help mocks upgrade-deps proto
 
 all: clean build
 
@@ -52,10 +51,6 @@ tidy:
 	@echo "Tidying dependencies..."
 	$(GO) mod tidy
 
-swagger:
-	@echo "Generating Swagger documentation..."
-	$(SWAG) init -g $(MAIN_PATH) -o ./docs
-
 mocks:
 	@echo "Generating mocks..."
 	$(MOCKERY) --all --output ./test/mocks --outpkg mocks
@@ -82,7 +77,6 @@ help:
 	@echo "  fmt        	- Format code"
 	@echo "  deps       	- Download dependencies"
 	@echo "  tidy       	- Tidy dependencies"
-	@echo "  swagger    	- Generate Swagger documentation"
 	@echo "  mocks      	- Generate mocks for testing"
 	@echo "  upgrade-deps 	- Upgrade dependencies"
 	@echo "  proto      	- Generate protobuf code"
