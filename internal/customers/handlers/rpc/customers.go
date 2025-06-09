@@ -45,7 +45,7 @@ func (s *CustomerServiceServer) CreateCustomer(ctx context.Context, req *pb.Crea
 		return nil, status.Error(codes.InvalidArgument, "created_by is required")
 	}
 
-	// Convert request to entity
+	// Convert request to entitites
 	customer := &entitites.Customer{
 		Name:      req.Name,
 		Email:     req.Email,
@@ -62,7 +62,7 @@ func (s *CustomerServiceServer) CreateCustomer(ctx context.Context, req *pb.Crea
 		return nil, status.Error(codes.Internal, "failed to create customer")
 	}
 
-	// Convert entity to response
+	// Convert entities to response
 	response := &pb.CreateCustomerResponse{
 		Customer: &pb.Customer{
 			Id:        uint64(customer.ID),
