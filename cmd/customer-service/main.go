@@ -7,7 +7,7 @@ import (
 	"github.com/pusrenk/customer-service/configs"
 	"github.com/pusrenk/customer-service/database"
 	"github.com/pusrenk/customer-service/internal/customers/handlers/rpc"
-	"github.com/pusrenk/customer-service/internal/customers/models"
+	pb "github.com/pusrenk/customer-service/internal/protobuf"
 	"github.com/pusrenk/customer-service/internal/customers/repositories"
 	"github.com/pusrenk/customer-service/internal/customers/services"
 	"github.com/pusrenk/customer-service/log"
@@ -44,7 +44,7 @@ func main() {
 	customerServer := rpc.NewCustomerServiceServer(customerService)
 
 	// register customers
-	models.RegisterCustomerServiceServer(grpcServer, customerServer)
+	pb.RegisterCustomerServiceServer(grpcServer, customerServer)
 
 	// start server
 	lis, err := net.Listen("tcp", fmt.Sprintf(":%d", cfg.App.GRPCPort))

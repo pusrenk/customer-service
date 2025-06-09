@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/pusrenk/customer-service/internal/customers/entitites"
-	"github.com/pusrenk/customer-service/internal/customers/models"
+	pb "github.com/pusrenk/customer-service/internal/protobuf"
 	"github.com/pusrenk/customer-service/internal/customers/services"
 	"github.com/pusrenk/customer-service/log"
 	"google.golang.org/grpc/codes"
@@ -16,7 +16,7 @@ import (
 )
 
 type CustomerServiceServer struct {
-	models.UnimplementedCustomerServiceServer
+	pb.UnimplementedCustomerServiceServer
 	customerService services.CustomerService
 }
 
@@ -26,7 +26,7 @@ func NewCustomerServiceServer(customerService services.CustomerService) *Custome
 	}
 }
 
-func (s *CustomerServiceServer) CreateCustomer(ctx context.Context, req *models.CreateCustomerRequest) (*models.CreateCustomerResponse, error) {
+func (s *CustomerServiceServer) CreateCustomer(ctx context.Context, req *pb.CreateCustomerRequest) (*pb.CreateCustomerResponse, error) {
 	// Validate request
 	if req.Name == "" {
 		log.Errorf("name is required")
@@ -63,8 +63,8 @@ func (s *CustomerServiceServer) CreateCustomer(ctx context.Context, req *models.
 	}
 
 	// Convert entity to response
-	response := &models.CreateCustomerResponse{
-		Customer: &models.Customer{
+	response := &pb.CreateCustomerResponse{
+		Customer: &pb.Customer{
 			Id:        uint64(customer.ID),
 			Name:      customer.Name,
 			Email:     customer.Email,
@@ -79,7 +79,7 @@ func (s *CustomerServiceServer) CreateCustomer(ctx context.Context, req *models.
 	return response, nil
 }
 
-func (s *CustomerServiceServer) GetCustomer(ctx context.Context, req *models.GetCustomerRequest) (*models.GetCustomerResponse, error) {
+func (s *CustomerServiceServer) GetCustomer(ctx context.Context, req *pb.GetCustomerRequest) (*pb.GetCustomerResponse, error) {
 	if req.Id == 0 {
 		log.Errorf("id is required")
 		return nil, status.Error(codes.InvalidArgument, "id is required")
@@ -95,8 +95,8 @@ func (s *CustomerServiceServer) GetCustomer(ctx context.Context, req *models.Get
 		return nil, status.Error(codes.Internal, "failed to get customer")
 	}
 
-	response := &models.GetCustomerResponse{
-		Customer: &models.Customer{
+	response := &pb.GetCustomerResponse{
+		Customer: &pb.Customer{
 			Id:        uint64(customer.ID),
 			Name:      customer.Name,
 			Email:     customer.Email,
@@ -111,19 +111,19 @@ func (s *CustomerServiceServer) GetCustomer(ctx context.Context, req *models.Get
 	return response, nil
 }
 
-func (s *CustomerServiceServer) ListCustomers(ctx context.Context, req *models.ListCustomersRequest) (*models.ListCustomersResponse, error) {
+func (s *CustomerServiceServer) ListCustomers(ctx context.Context, req *pb.ListCustomersRequest) (*pb.ListCustomersResponse, error) {
 	customers, err := s.customerService.GetAllCustomers()
 	if err != nil {
 		log.Errorf("failed to list customers: %v", err)
 		return nil, status.Error(codes.Internal, "failed to list customers")
 	}
 
-	response := &models.ListCustomersResponse{
-		Customers: make([]*models.Customer, len(customers)),
+	response := &pb.ListCustomersResponse{
+		Customers: make([]*pb.Customer, len(customers)),
 	}
 
 	for i, customer := range customers {
-		response.Customers[i] = &models.Customer{
+		response.Customers[i] = &pb.Customer{
 			Id:        uint64(customer.ID),
 			Name:      customer.Name,
 			Email:     customer.Email,
@@ -138,7 +138,7 @@ func (s *CustomerServiceServer) ListCustomers(ctx context.Context, req *models.L
 	return response, nil
 }
 
-func (s *CustomerServiceServer) UpdateCustomer(ctx context.Context, req *models.UpdateCustomerRequest) (*models.UpdateCustomerResponse, error) {
+func (s *CustomerServiceServer) UpdateCustomer(ctx context.Context, req *pb.UpdateCustomerRequest) (*pb.UpdateCustomerResponse, error) {
 	if req.Id == 0 {
 		log.Errorf("id is required")
 		return nil, status.Error(codes.InvalidArgument, "id is required")
@@ -184,8 +184,8 @@ func (s *CustomerServiceServer) UpdateCustomer(ctx context.Context, req *models.
 		return nil, status.Error(codes.Internal, "failed to update customer")
 	}
 
-	response := &models.UpdateCustomerResponse{
-		Customer: &models.Customer{
+	response := &pb.UpdateCustomerResponse{
+		Customer: &pb.Customer{
 			Id:        uint64(existingCustomer.ID),
 			Name:      existingCustomer.Name,
 			Email:     existingCustomer.Email,
@@ -200,7 +200,7 @@ func (s *CustomerServiceServer) UpdateCustomer(ctx context.Context, req *models.
 	return response, nil
 }
 
-func (s *CustomerServiceServer) DeleteCustomer(ctx context.Context, req *models.DeleteCustomerRequest) (*models.DeleteCustomerResponse, error) {
+func (s *CustomerServiceServer) DeleteCustomer(ctx context.Context, req *pb.DeleteCustomerRequest) (*pb.DeleteCustomerResponse, error) {
 	if req.Id == 0 {
 		log.Errorf("id is required")
 		return nil, status.Error(codes.InvalidArgument, "id is required")
@@ -223,5 +223,5 @@ func (s *CustomerServiceServer) DeleteCustomer(ctx context.Context, req *models.
 		return nil, status.Error(codes.Internal, "failed to delete customer")
 	}
 
-	return &models.DeleteCustomerResponse{}, nil
+	return &pb.DeleteCustomerResponse{}, nil
 }

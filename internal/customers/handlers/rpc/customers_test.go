@@ -6,7 +6,7 @@ import (
 	"time"
 
 	"github.com/pusrenk/customer-service/internal/customers/entitites"
-	"github.com/pusrenk/customer-service/internal/customers/models"
+	pb "github.com/pusrenk/customer-service/internal/protobuf"
 	"github.com/pusrenk/customer-service/test/mocks"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
@@ -31,14 +31,14 @@ func (s *CustomerServiceServerTestSuite) TestCreateCustomer() {
 	now := time.Now()
 	tests := []struct {
 		name          string
-		request       *models.CreateCustomerRequest
+		request       *pb.CreateCustomerRequest
 		mockSetup     func()
 		expectedError codes.Code
-		validate      func(*testing.T, *models.CreateCustomerResponse)
+		validate      func(*testing.T, *pb.CreateCustomerResponse)
 	}{
 		{
 			name: "success create customer",
-			request: &models.CreateCustomerRequest{
+			request: &pb.CreateCustomerRequest{
 				Name:      "John Doe",
 				Email:     "john@example.com",
 				Phone:     "+1234567890",
@@ -54,7 +54,7 @@ func (s *CustomerServiceServerTestSuite) TestCreateCustomer() {
 					}).Once()
 			},
 			expectedError: codes.OK,
-			validate: func(t *testing.T, response *models.CreateCustomerResponse) {
+			validate: func(t *testing.T, response *pb.CreateCustomerResponse) {
 				assert.NotNil(t, response)
 				assert.NotNil(t, response.Customer)
 				assert.Equal(t, uint64(1), response.Customer.Id)
@@ -69,51 +69,51 @@ func (s *CustomerServiceServerTestSuite) TestCreateCustomer() {
 		},
 		{
 			name: "missing name",
-			request: &models.CreateCustomerRequest{
+			request: &pb.CreateCustomerRequest{
 				Email:     "john@example.com",
 				Phone:     "+1234567890",
 				CreatedBy: "system",
 			},
 			mockSetup:     func() {},
 			expectedError: codes.InvalidArgument,
-			validate:      func(t *testing.T, response *models.CreateCustomerResponse) {},
+			validate:      func(t *testing.T, response *pb.CreateCustomerResponse) {},
 		},
 		{
 			name: "missing email",
-			request: &models.CreateCustomerRequest{
+			request: &pb.CreateCustomerRequest{
 				Name:      "John Doe",
 				Phone:     "+1234567890",
 				CreatedBy: "system",
 			},
 			mockSetup:     func() {},
 			expectedError: codes.InvalidArgument,
-			validate:      func(t *testing.T, response *models.CreateCustomerResponse) {},
+			validate:      func(t *testing.T, response *pb.CreateCustomerResponse) {},
 		},
 		{
 			name: "missing phone",
-			request: &models.CreateCustomerRequest{
+			request: &pb.CreateCustomerRequest{
 				Name:      "John Doe",
 				Email:     "john@example.com",
 				CreatedBy: "system",
 			},
 			mockSetup:     func() {},
 			expectedError: codes.InvalidArgument,
-			validate:      func(t *testing.T, response *models.CreateCustomerResponse) {},
+			validate:      func(t *testing.T, response *pb.CreateCustomerResponse) {},
 		},
 		{
 			name: "missing created_by",
-			request: &models.CreateCustomerRequest{
+			request: &pb.CreateCustomerRequest{
 				Name:  "John Doe",
 				Email: "john@example.com",
 				Phone: "+1234567890",
 			},
 			mockSetup:     func() {},
 			expectedError: codes.InvalidArgument,
-			validate:      func(t *testing.T, response *models.CreateCustomerResponse) {},
+			validate:      func(t *testing.T, response *pb.CreateCustomerResponse) {},
 		},
 		{
 			name: "service error",
-			request: &models.CreateCustomerRequest{
+			request: &pb.CreateCustomerRequest{
 				Name:      "John Doe",
 				Email:     "john@example.com",
 				Phone:     "+1234567890",
@@ -124,7 +124,7 @@ func (s *CustomerServiceServerTestSuite) TestCreateCustomer() {
 					Return(assert.AnError).Once()
 			},
 			expectedError: codes.Internal,
-			validate:      func(t *testing.T, response *models.CreateCustomerResponse) {},
+			validate:      func(t *testing.T, response *pb.CreateCustomerResponse) {},
 		},
 	}
 
@@ -154,14 +154,14 @@ func (s *CustomerServiceServerTestSuite) TestGetCustomer() {
 	now := time.Now()
 	tests := []struct {
 		name          string
-		request       *models.GetCustomerRequest
+		request       *pb.GetCustomerRequest
 		mockSetup     func()
 		expectedError codes.Code
-		validate      func(*testing.T, *models.GetCustomerResponse)
+		validate      func(*testing.T, *pb.GetCustomerResponse)
 	}{
 		{
 			name: "success get customer",
-			request: &models.GetCustomerRequest{
+			request: &pb.GetCustomerRequest{
 				Id: 1,
 			},
 			mockSetup: func() {
@@ -178,7 +178,7 @@ func (s *CustomerServiceServerTestSuite) TestGetCustomer() {
 					}, nil).Once()
 			},
 			expectedError: codes.OK,
-			validate: func(t *testing.T, response *models.GetCustomerResponse) {
+			validate: func(t *testing.T, response *pb.GetCustomerResponse) {
 				assert.NotNil(t, response)
 				assert.NotNil(t, response.Customer)
 				assert.Equal(t, uint64(1), response.Customer.Id)
@@ -193,16 +193,16 @@ func (s *CustomerServiceServerTestSuite) TestGetCustomer() {
 		},
 		{
 			name: "invalid id",
-			request: &models.GetCustomerRequest{
+			request: &pb.GetCustomerRequest{
 				Id: 0,
 			},
 			mockSetup:     func() {},
 			expectedError: codes.InvalidArgument,
-			validate:      func(t *testing.T, response *models.GetCustomerResponse) {},
+			validate:      func(t *testing.T, response *pb.GetCustomerResponse) {},
 		},
 		{
 			name: "customer not found",
-			request: &models.GetCustomerRequest{
+			request: &pb.GetCustomerRequest{
 				Id: 1,
 			},
 			mockSetup: func() {
@@ -210,11 +210,11 @@ func (s *CustomerServiceServerTestSuite) TestGetCustomer() {
 					Return(nil, gorm.ErrRecordNotFound).Once()
 			},
 			expectedError: codes.NotFound,
-			validate:      func(t *testing.T, response *models.GetCustomerResponse) {},
+			validate:      func(t *testing.T, response *pb.GetCustomerResponse) {},
 		},
 		{
 			name: "service error",
-			request: &models.GetCustomerRequest{
+			request: &pb.GetCustomerRequest{
 				Id: 1,
 			},
 			mockSetup: func() {
@@ -222,7 +222,7 @@ func (s *CustomerServiceServerTestSuite) TestGetCustomer() {
 					Return(nil, assert.AnError).Once()
 			},
 			expectedError: codes.Internal,
-			validate:      func(t *testing.T, response *models.GetCustomerResponse) {},
+			validate:      func(t *testing.T, response *pb.GetCustomerResponse) {},
 		},
 	}
 
@@ -252,14 +252,14 @@ func (s *CustomerServiceServerTestSuite) TestListCustomers() {
 	now := time.Now()
 	tests := []struct {
 		name          string
-		request       *models.ListCustomersRequest
+		request       *pb.ListCustomersRequest
 		mockSetup     func()
 		expectedError codes.Code
-		validate      func(*testing.T, *models.ListCustomersResponse)
+		validate      func(*testing.T, *pb.ListCustomersResponse)
 	}{
 		{
 			name:    "success list customers",
-			request: &models.ListCustomersRequest{},
+			request: &pb.ListCustomersRequest{},
 			mockSetup: func() {
 				s.mockService.EXPECT().GetAllCustomers().
 					Return([]*entitites.Customer{
@@ -276,7 +276,7 @@ func (s *CustomerServiceServerTestSuite) TestListCustomers() {
 					}, nil).Once()
 			},
 			expectedError: codes.OK,
-			validate: func(t *testing.T, response *models.ListCustomersResponse) {
+			validate: func(t *testing.T, response *pb.ListCustomersResponse) {
 				assert.NotNil(t, response)
 				assert.NotNil(t, response.Customers)
 				assert.Equal(t, 1, len(response.Customers))
@@ -292,13 +292,13 @@ func (s *CustomerServiceServerTestSuite) TestListCustomers() {
 		},
 		{
 			name:    "service error",
-			request: &models.ListCustomersRequest{},
+			request: &pb.ListCustomersRequest{},
 			mockSetup: func() {
 				s.mockService.EXPECT().GetAllCustomers().
 					Return(nil, assert.AnError).Once()
 			},
 			expectedError: codes.Internal,
-			validate:      func(t *testing.T, response *models.ListCustomersResponse) {},
+			validate:      func(t *testing.T, response *pb.ListCustomersResponse) {},
 		},
 	}
 	for _, tt := range tests {
@@ -327,14 +327,14 @@ func (s *CustomerServiceServerTestSuite) TestUpdateCustomer() {
 	now := time.Now()
 	tests := []struct {
 		name          string
-		request       *models.UpdateCustomerRequest
+		request       *pb.UpdateCustomerRequest
 		mockSetup     func()
 		expectedError codes.Code
-		validate      func(*testing.T, *models.UpdateCustomerResponse)
+		validate      func(*testing.T, *pb.UpdateCustomerResponse)
 	}{
 		{
 			name: "success update customer",
-			request: &models.UpdateCustomerRequest{
+			request: &pb.UpdateCustomerRequest{
 				Id:        1,
 				Name:      "John Doe",
 				Email:     "john@example.com",
@@ -357,7 +357,7 @@ func (s *CustomerServiceServerTestSuite) TestUpdateCustomer() {
 					Return(nil).Once()
 			},
 			expectedError: codes.OK,
-			validate: func(t *testing.T, response *models.UpdateCustomerResponse) {
+			validate: func(t *testing.T, response *pb.UpdateCustomerResponse) {
 				assert.NotNil(t, response)
 				assert.NotNil(t, response.Customer)
 				assert.Equal(t, uint64(1), response.Customer.Id)
@@ -372,16 +372,16 @@ func (s *CustomerServiceServerTestSuite) TestUpdateCustomer() {
 		},
 		{
 			name: "invalid id",
-			request: &models.UpdateCustomerRequest{
+			request: &pb.UpdateCustomerRequest{
 				Id: 0,
 			},
 			mockSetup:     func() {},
 			expectedError: codes.InvalidArgument,
-			validate:      func(t *testing.T, response *models.UpdateCustomerResponse) {},
+			validate:      func(t *testing.T, response *pb.UpdateCustomerResponse) {},
 		},
 		{
 			name: "missing name",
-			request: &models.UpdateCustomerRequest{
+			request: &pb.UpdateCustomerRequest{
 				Id:        1,
 				Email:     "john@example.com",
 				Phone:     "+1234567890",
@@ -389,11 +389,11 @@ func (s *CustomerServiceServerTestSuite) TestUpdateCustomer() {
 			},
 			mockSetup:     func() {},
 			expectedError: codes.InvalidArgument,
-			validate:      func(t *testing.T, response *models.UpdateCustomerResponse) {},
+			validate:      func(t *testing.T, response *pb.UpdateCustomerResponse) {},
 		},
 		{
 			name: "missing email",
-			request: &models.UpdateCustomerRequest{
+			request: &pb.UpdateCustomerRequest{
 				Id:        1,
 				Name:      "John Doe",
 				Phone:     "+1234567890",
@@ -401,11 +401,11 @@ func (s *CustomerServiceServerTestSuite) TestUpdateCustomer() {
 			},
 			mockSetup:     func() {},
 			expectedError: codes.InvalidArgument,
-			validate:      func(t *testing.T, response *models.UpdateCustomerResponse) {},
+			validate:      func(t *testing.T, response *pb.UpdateCustomerResponse) {},
 		},
 		{
 			name: "missing phone",
-			request: &models.UpdateCustomerRequest{
+			request: &pb.UpdateCustomerRequest{
 				Id:        1,
 				Name:      "John Doe",
 				Email:     "john@example.com",
@@ -413,11 +413,11 @@ func (s *CustomerServiceServerTestSuite) TestUpdateCustomer() {
 			},
 			mockSetup:     func() {},
 			expectedError: codes.InvalidArgument,
-			validate:      func(t *testing.T, response *models.UpdateCustomerResponse) {},
+			validate:      func(t *testing.T, response *pb.UpdateCustomerResponse) {},
 		},
 		{
 			name: "missing updated_by",
-			request: &models.UpdateCustomerRequest{
+			request: &pb.UpdateCustomerRequest{
 				Id:    1,
 				Name:  "John Doe",
 				Email: "john@example.com",
@@ -425,11 +425,11 @@ func (s *CustomerServiceServerTestSuite) TestUpdateCustomer() {
 			},
 			mockSetup:     func() {},
 			expectedError: codes.InvalidArgument,
-			validate:      func(t *testing.T, response *models.UpdateCustomerResponse) {},
+			validate:      func(t *testing.T, response *pb.UpdateCustomerResponse) {},
 		},
 		{
 			name: "customer not found",
-			request: &models.UpdateCustomerRequest{
+			request: &pb.UpdateCustomerRequest{
 				Id:        1,
 				Name:      "John Doe",
 				Email:     "john@example.com",
@@ -441,11 +441,11 @@ func (s *CustomerServiceServerTestSuite) TestUpdateCustomer() {
 					Return(nil, gorm.ErrRecordNotFound).Once()
 			},
 			expectedError: codes.NotFound,
-			validate:      func(t *testing.T, response *models.UpdateCustomerResponse) {},
+			validate:      func(t *testing.T, response *pb.UpdateCustomerResponse) {},
 		},
 		{
 			name: "get customer by id error",
-			request: &models.UpdateCustomerRequest{
+			request: &pb.UpdateCustomerRequest{
 				Id:        1,
 				Name:      "John Doe",
 				Email:     "john@example.com",
@@ -457,11 +457,11 @@ func (s *CustomerServiceServerTestSuite) TestUpdateCustomer() {
 					Return(nil, assert.AnError).Once()
 			},
 			expectedError: codes.Internal,
-			validate:      func(t *testing.T, response *models.UpdateCustomerResponse) {},
+			validate:      func(t *testing.T, response *pb.UpdateCustomerResponse) {},
 		},
 		{
 			name: "update customer error",
-			request: &models.UpdateCustomerRequest{
+			request: &pb.UpdateCustomerRequest{
 				Id:        1,
 				Name:      "John Doe",
 				Email:     "john@example.com",
@@ -477,7 +477,7 @@ func (s *CustomerServiceServerTestSuite) TestUpdateCustomer() {
 					Return(assert.AnError).Once()
 			},
 			expectedError: codes.Internal,
-			validate:      func(t *testing.T, response *models.UpdateCustomerResponse) {},
+			validate:      func(t *testing.T, response *pb.UpdateCustomerResponse) {},
 		},
 	}
 	for _, tt := range tests {
@@ -505,14 +505,14 @@ func (s *CustomerServiceServerTestSuite) TestUpdateCustomer() {
 func (s *CustomerServiceServerTestSuite) TestDeleteCustomer() {
 	tests := []struct {
 		name          string
-		request       *models.DeleteCustomerRequest
+		request       *pb.DeleteCustomerRequest
 		mockSetup     func()
 		expectedError codes.Code
-		validate      func(*testing.T, *models.DeleteCustomerResponse)
+		validate      func(*testing.T, *pb.DeleteCustomerResponse)
 	}{
 		{
 			name: "success delete customer",
-			request: &models.DeleteCustomerRequest{
+			request: &pb.DeleteCustomerRequest{
 				Id: 1,
 			},
 			mockSetup: func() {
@@ -524,20 +524,20 @@ func (s *CustomerServiceServerTestSuite) TestDeleteCustomer() {
 					Return(nil).Once()
 			},
 			expectedError: codes.OK,
-			validate:      func(t *testing.T, response *models.DeleteCustomerResponse) {},
+			validate:      func(t *testing.T, response *pb.DeleteCustomerResponse) {},
 		},
 		{
 			name: "invalid id",
-			request: &models.DeleteCustomerRequest{
+			request: &pb.DeleteCustomerRequest{
 				Id: 0,
 			},
 			mockSetup:     func() {},
 			expectedError: codes.InvalidArgument,
-			validate:      func(t *testing.T, response *models.DeleteCustomerResponse) {},
+			validate:      func(t *testing.T, response *pb.DeleteCustomerResponse) {},
 		},
 		{
 			name: "customer not found",
-			request: &models.DeleteCustomerRequest{
+			request: &pb.DeleteCustomerRequest{
 				Id: 1,
 			},
 			mockSetup: func() {
@@ -545,11 +545,11 @@ func (s *CustomerServiceServerTestSuite) TestDeleteCustomer() {
 					Return(nil, gorm.ErrRecordNotFound).Once()
 			},
 			expectedError: codes.NotFound,
-			validate:      func(t *testing.T, response *models.DeleteCustomerResponse) {},
+			validate:      func(t *testing.T, response *pb.DeleteCustomerResponse) {},
 		},
 		{
 			name: "get customer by id error",
-			request: &models.DeleteCustomerRequest{
+			request: &pb.DeleteCustomerRequest{
 				Id: 1,
 			},
 			mockSetup: func() {
@@ -557,11 +557,11 @@ func (s *CustomerServiceServerTestSuite) TestDeleteCustomer() {
 					Return(nil, assert.AnError).Once()
 			},
 			expectedError: codes.Internal,
-			validate:      func(t *testing.T, response *models.DeleteCustomerResponse) {},
+			validate:      func(t *testing.T, response *pb.DeleteCustomerResponse) {},
 		},
 		{
 			name: "service error",
-			request: &models.DeleteCustomerRequest{
+			request: &pb.DeleteCustomerRequest{
 				Id: 1,
 			},
 			mockSetup: func() {
@@ -573,7 +573,7 @@ func (s *CustomerServiceServerTestSuite) TestDeleteCustomer() {
 					Return(assert.AnError).Once()
 			},
 			expectedError: codes.Internal,
-			validate:      func(t *testing.T, response *models.DeleteCustomerResponse) {},
+			validate:      func(t *testing.T, response *pb.DeleteCustomerResponse) {},
 		},
 	}
 	for _, tt := range tests {
