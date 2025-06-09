@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/pusrenk/customer-service/configs"
+	"github.com/pusrenk/customer-service/consts"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/logger"
@@ -12,7 +13,7 @@ import (
 // InitDatabase init database
 func InitDatabase(cfg *configs.Config) (*gorm.DB, error) {
 	loggerMode := logger.Silent
-	if cfg.App.Env != "production" {
+	if cfg.App.Env != consts.EnvProduction {
 		loggerMode = logger.Info
 	}
 
