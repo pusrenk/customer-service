@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package customer;
+
+option go_package = "github.com/pusrenk/customer-service/internal/customers/models";
+
+import "google/protobuf/timestamp.proto";
+
+service CustomerService {
+  rpc CreateCustomer(CreateCustomerRequest) returns (CreateCustomerResponse);
+  rpc GetCustomer(GetCustomerRequest) returns (GetCustomerResponse);
+  rpc ListCustomers(ListCustomersRequest) returns (ListCustomersResponse);
+  rpc UpdateCustomer(UpdateCustomerRequest) returns (UpdateCustomerResponse);
+  rpc DeleteCustomer(DeleteCustomerRequest) returns (DeleteCustomerResponse);
+}
+
+message Customer {
+  uint64 id = 1;
+  string name = 2;
+  string email = 3;
+  string phone = 4;
+  google.protobuf.Timestamp created_at = 5;
+  string created_by = 6;
+  google.protobuf.Timestamp updated_at = 7;
+  string updated_by = 8;
+}
+
+message CreateCustomerRequest {
+  string name = 1;
+  string email = 2;
+  string phone = 3;
+  string created_by = 4;
+}
+
+message CreateCustomerResponse {
+  Customer customer = 1;
+}
+
+message GetCustomerRequest {
+  uint64 id = 1;
+}
+
+message GetCustomerResponse {
+  Customer customer = 1;
+}
+
+message ListCustomersRequest {}
+
+message ListCustomersResponse {
+  repeated Customer customers = 1;
+}
+
+message UpdateCustomerRequest {
+  uint64 id = 1;
+  string name = 2;
+  string email = 3;
+  string phone = 4;
+  string updated_by = 5;
+}
+
+message UpdateCustomerResponse {
+  Customer customer = 1;
+}
+
+message DeleteCustomerRequest {
+  uint64 id = 1;
+}
+
+message DeleteCustomerResponse {} 
