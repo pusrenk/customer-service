@@ -193,6 +193,68 @@ func (_c *MockCustomerRepository_GetAllCustomers_Call) RunAndReturn(run func() (
 	return _c
 }
 
+// GetCustomerByEmail provides a mock function for the type MockCustomerRepository
+func (_mock *MockCustomerRepository) GetCustomerByEmail(email string) (*entitites.Customer, error) {
+	ret := _mock.Called(email)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetCustomerByEmail")
+	}
+
+	var r0 *entitites.Customer
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(string) (*entitites.Customer, error)); ok {
+		return returnFunc(email)
+	}
+	if returnFunc, ok := ret.Get(0).(func(string) *entitites.Customer); ok {
+		r0 = returnFunc(email)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*entitites.Customer)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(string) error); ok {
+		r1 = returnFunc(email)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// MockCustomerRepository_GetCustomerByEmail_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetCustomerByEmail'
+type MockCustomerRepository_GetCustomerByEmail_Call struct {
+	*mock.Call
+}
+
+// GetCustomerByEmail is a helper method to define mock.On call
+//   - email string
+func (_e *MockCustomerRepository_Expecter) GetCustomerByEmail(email interface{}) *MockCustomerRepository_GetCustomerByEmail_Call {
+	return &MockCustomerRepository_GetCustomerByEmail_Call{Call: _e.mock.On("GetCustomerByEmail", email)}
+}
+
+func (_c *MockCustomerRepository_GetCustomerByEmail_Call) Run(run func(email string)) *MockCustomerRepository_GetCustomerByEmail_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 string
+		if args[0] != nil {
+			arg0 = args[0].(string)
+		}
+		run(
+			arg0,
+		)
+	})
+	return _c
+}
+
+func (_c *MockCustomerRepository_GetCustomerByEmail_Call) Return(customer *entitites.Customer, err error) *MockCustomerRepository_GetCustomerByEmail_Call {
+	_c.Call.Return(customer, err)
+	return _c
+}
+
+func (_c *MockCustomerRepository_GetCustomerByEmail_Call) RunAndReturn(run func(email string) (*entitites.Customer, error)) *MockCustomerRepository_GetCustomerByEmail_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetCustomerByID provides a mock function for the type MockCustomerRepository
 func (_mock *MockCustomerRepository) GetCustomerByID(id uint) (*entitites.Customer, error) {
 	ret := _mock.Called(id)
@@ -251,6 +313,68 @@ func (_c *MockCustomerRepository_GetCustomerByID_Call) Return(customer *entitite
 }
 
 func (_c *MockCustomerRepository_GetCustomerByID_Call) RunAndReturn(run func(id uint) (*entitites.Customer, error)) *MockCustomerRepository_GetCustomerByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetCustomerByPhone provides a mock function for the type MockCustomerRepository
+func (_mock *MockCustomerRepository) GetCustomerByPhone(phoneNumber string) (*entitites.Customer, error) {
+	ret := _mock.Called(phoneNumber)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetCustomerByPhone")
+	}
+
+	var r0 *entitites.Customer
+	var r1 error
+	if returnFunc, ok := ret.Get(0).(func(string) (*entitites.Customer, error)); ok {
+		return returnFunc(phoneNumber)
+	}
+	if returnFunc, ok := ret.Get(0).(func(string) *entitites.Customer); ok {
+		r0 = returnFunc(phoneNumber)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*entitites.Customer)
+		}
+	}
+	if returnFunc, ok := ret.Get(1).(func(string) error); ok {
+		r1 = returnFunc(phoneNumber)
+	} else {
+		r1 = ret.Error(1)
+	}
+	return r0, r1
+}
+
+// MockCustomerRepository_GetCustomerByPhone_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetCustomerByPhone'
+type MockCustomerRepository_GetCustomerByPhone_Call struct {
+	*mock.Call
+}
+
+// GetCustomerByPhone is a helper method to define mock.On call
+//   - phoneNumber string
+func (_e *MockCustomerRepository_Expecter) GetCustomerByPhone(phoneNumber interface{}) *MockCustomerRepository_GetCustomerByPhone_Call {
+	return &MockCustomerRepository_GetCustomerByPhone_Call{Call: _e.mock.On("GetCustomerByPhone", phoneNumber)}
+}
+
+func (_c *MockCustomerRepository_GetCustomerByPhone_Call) Run(run func(phoneNumber string)) *MockCustomerRepository_GetCustomerByPhone_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		var arg0 string
+		if args[0] != nil {
+			arg0 = args[0].(string)
+		}
+		run(
+			arg0,
+		)
+	})
+	return _c
+}
+
+func (_c *MockCustomerRepository_GetCustomerByPhone_Call) Return(customer *entitites.Customer, err error) *MockCustomerRepository_GetCustomerByPhone_Call {
+	_c.Call.Return(customer, err)
+	return _c
+}
+
+func (_c *MockCustomerRepository_GetCustomerByPhone_Call) RunAndReturn(run func(phoneNumber string) (*entitites.Customer, error)) *MockCustomerRepository_GetCustomerByPhone_Call {
 	_c.Call.Return(run)
 	return _c
 }

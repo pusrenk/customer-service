@@ -122,6 +122,106 @@ func (s *CustomerServiceTestSuite) TestGetCustomerByID() {
 	}
 }
 
+func (s *CustomerServiceTestSuite) TestGetCustomerByEmail() {
+	tests := []struct {
+		name         string
+		email        string
+		mock         func(email string)
+		wantErr      bool
+		wantCustomer *entitites.Customer
+	}{
+		{
+			name: "success get customer by email",
+			email: "john@example.com",
+			mock: func(email string) {
+				s.mockRepo.On("GetCustomerByEmail", email).Return(&entitites.Customer{
+					ID:        1,
+					Name:      "John Doe",
+					Email:     "john@example.com",
+					Phone:     "+1234567890",
+					CreatedBy: "system",
+					UpdatedBy: "system",
+				}, nil).Once()
+			},
+			wantCustomer: &entitites.Customer{
+				ID:        1,
+				Name:      "John Doe",
+				Email:     "john@example.com",
+				Phone:     "+1234567890",
+				CreatedBy: "system",
+				UpdatedBy: "system",
+			},
+		},
+		{
+			name: "error get customer by email",
+			email: "john@example.com",
+			mock: func(email string) {
+				s.mockRepo.On("GetCustomerByEmail", email).Return(nil, context.DeadlineExceeded).Once()
+			},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		s.T().Run(tt.name, func(t *testing.T) {
+			tt.mock(tt.email)
+			customer, err := s.service.GetCustomerByEmail(tt.email)
+			assert.Equal(t, tt.wantErr, err != nil)
+			assert.Equal(t, tt.wantCustomer, customer)
+		})
+	}
+}
+
+func (s *CustomerServiceTestSuite) TestGetCustomerByPhone() {
+	tests := []struct {
+		name         string
+		phone        string
+		mock         func(phone string)
+		wantErr      bool
+		wantCustomer *entitites.Customer
+	}{
+		{
+			name: "success get customer by phone",
+			phone: "+1234567890",
+			mock: func(phone string) {
+				s.mockRepo.On("GetCustomerByPhone", phone).Return(&entitites.Customer{
+					ID:        1,
+					Name:      "John Doe",
+					Email:     "john@example.com",
+					Phone:     "+1234567890",
+					CreatedBy: "system",
+					UpdatedBy: "system",
+				}, nil).Once()
+			},
+			wantCustomer: &entitites.Customer{
+				ID:        1,
+				Name:      "John Doe",
+				Email:     "john@example.com",
+				Phone:     "+1234567890",
+				CreatedBy: "system",
+				UpdatedBy: "system",
+			},
+		},
+		{
+			name: "error get customer by phone",
+			phone: "+1234567890",
+			mock: func(phone string) {
+				s.mockRepo.On("GetCustomerByPhone", phone).Return(nil, context.DeadlineExceeded).Once()
+			},
+			wantErr: true,
+		},
+	}
+
+	for _, tt := range tests {
+		s.T().Run(tt.name, func(t *testing.T) {
+			tt.mock(tt.phone)
+			customer, err := s.service.GetCustomerByPhone(tt.phone)
+			assert.Equal(t, tt.wantErr, err != nil)
+			assert.Equal(t, tt.wantCustomer, customer)
+		})
+	}
+}
+
 func (s *CustomerServiceTestSuite) TestGetAllCustomers() {
 	tests := []struct {
 		name          string
