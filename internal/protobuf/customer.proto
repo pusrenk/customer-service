@@ -2,13 +2,15 @@ syntax = "proto3";
 
 package customer;
 
-option go_package = "github.com/pusrenk/customer-service/internal/customers/models";
+option go_package = "github.com/pusrenk/customer-service/internal/protobuf";
 
 import "google/protobuf/timestamp.proto";
 
 service CustomerService {
   rpc CreateCustomer(CreateCustomerRequest) returns (CreateCustomerResponse);
   rpc GetCustomer(GetCustomerRequest) returns (GetCustomerResponse);
+  rpc GetCustomerByEmail(GetCustomerByEmailRequest) returns (GetCustomerResponse);
+  rpc GetCustomerByPhone(GetCustomerByPhoneRequest) returns (GetCustomerResponse);
   rpc ListCustomers(ListCustomersRequest) returns (ListCustomersResponse);
   rpc UpdateCustomer(UpdateCustomerRequest) returns (UpdateCustomerResponse);
   rpc DeleteCustomer(DeleteCustomerRequest) returns (DeleteCustomerResponse);
@@ -38,6 +40,14 @@ message CreateCustomerResponse {
 
 message GetCustomerRequest {
   uint64 id = 1;
+}
+
+message GetCustomerByEmailRequest {
+  string email = 1;
+}
+
+message GetCustomerByPhoneRequest {
+  string phone = 1;
 }
 
 message GetCustomerResponse {

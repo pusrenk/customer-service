@@ -8,6 +8,8 @@ import (
 type CustomerService interface {
 	CreateCustomer(customer *entitites.Customer) error
 	GetCustomerByID(id uint) (*entitites.Customer, error)
+	GetCustomerByEmail(email string) (*entitites.Customer, error)
+	GetCustomerByPhone(phoneNumber string) (*entitites.Customer, error)
 	GetAllCustomers() ([]*entitites.Customer, error)
 	UpdateCustomer(customer *entitites.Customer) error
 	DeleteCustomer(id uint) error
@@ -33,6 +35,15 @@ func (s *customerService) GetCustomerByID(id uint) (*entitites.Customer, error) 
 	return s.customerRepository.GetCustomerByID(id)
 }
 
+// GetCustomerByEmail returns a customer by email
+func (s *customerService) GetCustomerByEmail(email string) (*entitites.Customer, error) {
+	return s.customerRepository.GetCustomerByEmail(email)
+}
+
+// GetCustomerByPhone returns a customer by phone
+func (s *customerService) GetCustomerByPhone(phoneNumber string) (*entitites.Customer, error) {
+	return s.customerRepository.GetCustomerByPhone(phoneNumber)
+}
 // GetAllCustomers returns all customers
 func (s *customerService) GetAllCustomers() ([]*entitites.Customer, error) {
 	return s.customerRepository.GetAllCustomers()

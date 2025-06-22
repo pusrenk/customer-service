@@ -9,6 +9,8 @@ type CustomerRepository interface {
 	CreateCustomer(customer *entitites.Customer) error
 	GetCustomerByID(id uint) (*entitites.Customer, error)
 	GetAllCustomers() ([]*entitites.Customer, error)
+	GetCustomerByEmail(email string) (*entitites.Customer, error)
+	GetCustomerByPhone(phoneNumber string) (*entitites.Customer, error)
 	UpdateCustomer(customer *entitites.Customer) error
 	DeleteCustomer(id uint) error
 }
@@ -44,9 +46,27 @@ func (r *customerRepository) GetAllCustomers() ([]*entitites.Customer, error) {
 	return customers, nil
 }
 
+// GetCustomerByEmail get customer by email
+func (r *customerRepository) GetCustomerByEmail(email string) (*entitites.Customer, error) {
+	var customer entitites.Customer
+	if err := r.db.Where("email = ?", email).First(&customer).Error; err != nil {
+		return nil, err
+	}
+	return &customer, nil
+}
+
+// GetCustomerByPhone get customer by phone
+func (r *customerRepository) GetCustomerByPhone(phoneNumber string) (*entitites.Customer, error) {
+	var customer entitites.Customer
+	if err := r.db.Where("phone = ?", phoneNumber).First(&customer).Error; err != nil {
+		return nil, err
+	}
+	return &customer, nil
+}
+
 // UpdateCustomer update customer
 func (r *customerRepository) UpdateCustomer(customer *entitites.Customer) error {
-	return r.db.Save(customer).Error
+	return r.db.Model(&entitites.Customer{}).Where("id = ?", customer.ID).Select("name", "email", "phone", "updated_at", "updated_by").Updates(customer).Error
 }
 
 // DeleteCustomer delete customer by id

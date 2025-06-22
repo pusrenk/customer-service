@@ -216,6 +216,152 @@ func (s *CustomerRepositoryTestSuite) TestGetAllCustomers() {
 	}
 }
 
+func (s *CustomerRepositoryTestSuite) TestGetCustomerByEmail() {
+	now := time.Now()
+	customer := &entitites.Customer{
+		ID:        1,
+		Name:      "John Doe",
+		Email:     "john@example.com",
+		Phone:     "+1234567890",
+		CreatedAt: now,
+		CreatedBy: "system",
+		UpdatedAt: now,
+		UpdatedBy: "system",
+	}
+	tests := []struct {
+		name    string
+		email   string
+		mock    func()
+		want    *entitites.Customer
+		wantErr bool
+	}{
+		{
+			name:  "success get customer by email",
+			email: "john@example.com",
+			mock: func() {
+				s.mock.ExpectQuery(`SELECT \* FROM "customers" WHERE email = \$1 AND "customers"."deleted_at" IS NULL ORDER BY "customers"."id" LIMIT \$2`).
+					WithArgs(customer.Email, 1).
+					WillReturnRows(sqlmock.NewRows([]string{"id", "name", "email", "phone", "created_at", "created_by", "updated_at", "updated_by"}).
+						AddRow(customer.ID, customer.Name, customer.Email, customer.Phone, customer.CreatedAt, customer.CreatedBy, customer.UpdatedAt, customer.UpdatedBy))
+			},
+			want:    customer,
+			wantErr: false,
+		},
+		{
+			name:  "error get customer by email - not found",
+			email: "nonexistent@example.com",
+			mock: func() {
+				s.mock.ExpectQuery(`SELECT \* FROM "customers" WHERE email = \$1 AND "customers"."deleted_at" IS NULL ORDER BY "customers"."id" LIMIT \$2`).
+					WithArgs("nonexistent@example.com", 1).
+					WillReturnError(gorm.ErrRecordNotFound)
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:  "error get customer by email - database error",
+			email: "john@example.com",
+			mock: func() {
+				s.mock.ExpectQuery(`SELECT \* FROM "customers" WHERE email = \$1 AND "customers"."deleted_at" IS NULL ORDER BY "customers"."id" LIMIT \$2`).
+					WithArgs(customer.Email, 1).
+					WillReturnError(gorm.ErrInvalidDB)
+			},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		s.T().Run(tt.name, func(t *testing.T) {
+			tt.mock()
+			got, err := s.repo.GetCustomerByEmail(tt.email)
+			if tt.wantErr {
+				assert.Error(t, err)
+				assert.Nil(t, got)
+			} else {
+				assert.NoError(t, err)
+				assert.NotNil(t, got)
+				assert.Equal(t, tt.want.ID, got.ID)
+				assert.Equal(t, tt.want.Email, got.Email)
+				assert.Equal(t, tt.want.Name, got.Name)
+				assert.Equal(t, tt.want.Phone, got.Phone)
+			}
+		})
+	}
+}
+
+func (s *CustomerRepositoryTestSuite) TestGetCustomerByPhone() {
+	now := time.Now()
+	customer := &entitites.Customer{
+		ID:        1,
+		Name:      "John Doe",
+		Email:     "john@example.com",
+		Phone:     "+1234567890",
+		CreatedAt: now,
+		CreatedBy: "system",
+		UpdatedAt: now,
+		UpdatedBy: "system",
+	}
+	tests := []struct {
+		name        string
+		phoneNumber string
+		mock        func()
+		want        *entitites.Customer
+		wantErr     bool
+	}{
+		{
+			name:        "success get customer by phone",
+			phoneNumber: "+1234567890",
+			mock: func() {
+				s.mock.ExpectQuery(`SELECT \* FROM "customers" WHERE phone = \$1 AND "customers"."deleted_at" IS NULL ORDER BY "customers"."id" LIMIT \$2`).
+					WithArgs(customer.Phone, 1).
+					WillReturnRows(sqlmock.NewRows([]string{"id", "name", "email", "phone", "created_at", "created_by", "updated_at", "updated_by"}).
+						AddRow(customer.ID, customer.Name, customer.Email, customer.Phone, customer.CreatedAt, customer.CreatedBy, customer.UpdatedAt, customer.UpdatedBy))
+			},
+			want:    customer,
+			wantErr: false,
+		},
+		{
+			name:        "error get customer by phone - not found",
+			phoneNumber: "+9999999999",
+			mock: func() {
+				s.mock.ExpectQuery(`SELECT \* FROM "customers" WHERE phone = \$1 AND "customers"."deleted_at" IS NULL ORDER BY "customers"."id" LIMIT \$2`).
+					WithArgs("+9999999999", 1).
+					WillReturnError(gorm.ErrRecordNotFound)
+			},
+			want:    nil,
+			wantErr: true,
+		},
+		{
+			name:        "error get customer by phone - database error",
+			phoneNumber: "+1234567890",
+			mock: func() {
+				s.mock.ExpectQuery(`SELECT \* FROM "customers" WHERE phone = \$1 AND "customers"."deleted_at" IS NULL ORDER BY "customers"."id" LIMIT \$2`).
+					WithArgs(customer.Phone, 1).
+					WillReturnError(gorm.ErrInvalidDB)
+			},
+			want:    nil,
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		s.T().Run(tt.name, func(t *testing.T) {
+			tt.mock()
+			got, err := s.repo.GetCustomerByPhone(tt.phoneNumber)
+			if tt.wantErr {
+				assert.Error(t, err)
+				assert.Nil(t, got)
+			} else {
+				assert.NoError(t, err)
+				assert.NotNil(t, got)
+				assert.Equal(t, tt.want.ID, got.ID)
+				assert.Equal(t, tt.want.Email, got.Email)
+				assert.Equal(t, tt.want.Name, got.Name)
+				assert.Equal(t, tt.want.Phone, got.Phone)
+			}
+		})
+	}
+}
+
 func (s *CustomerRepositoryTestSuite) TestUpdateCustomer() {
 	tests := []struct {
 		name     string
@@ -234,8 +380,8 @@ func (s *CustomerRepositoryTestSuite) TestUpdateCustomer() {
 			},
 			mock: func(customer *entitites.Customer) {
 				s.mock.ExpectBegin()
-				s.mock.ExpectExec(`UPDATE "customers" SET "name"=\$1,"email"=\$2,"phone"=\$3,"created_at"=\$4,"created_by"=\$5,"updated_at"=\$6,"updated_by"=\$7,"deleted_at"=\$8 WHERE "customers"."deleted_at" IS NULL AND "id" = \$9`).
-					WithArgs(customer.Name, customer.Email, customer.Phone, sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), customer.UpdatedBy, sqlmock.AnyArg(), customer.ID).
+				s.mock.ExpectExec(`UPDATE "customers" SET "name"=\$1,"email"=\$2,"phone"=\$3,"updated_at"=\$4,"updated_by"=\$5 WHERE id = \$6 AND "customers"."deleted_at" IS NULL`).
+					WithArgs(customer.Name, customer.Email, customer.Phone, sqlmock.AnyArg(), customer.UpdatedBy, customer.ID).
 					WillReturnResult(sqlmock.NewResult(1, 1))
 				s.mock.ExpectCommit()
 			},
@@ -252,8 +398,8 @@ func (s *CustomerRepositoryTestSuite) TestUpdateCustomer() {
 			},
 			mock: func(customer *entitites.Customer) {
 				s.mock.ExpectBegin()
-				s.mock.ExpectExec(`UPDATE "customers" SET "name"=\$1,"email"=\$2,"phone"=\$3,"created_at"=\$4,"created_by"=\$5,"updated_at"=\$6,"updated_by"=\$7,"deleted_at"=\$8 WHERE "customers"."deleted_at" IS NULL AND "id" = \$9`).
-					WithArgs(customer.Name, customer.Email, customer.Phone, sqlmock.AnyArg(), sqlmock.AnyArg(), sqlmock.AnyArg(), customer.UpdatedBy, sqlmock.AnyArg(), customer.ID).
+				s.mock.ExpectExec(`UPDATE "customers" SET "name"=\$1,"email"=\$2,"phone"=\$3,"updated_at"=\$4,"updated_by"=\$5 WHERE id = \$6 AND "customers"."deleted_at" IS NULL`).
+					WithArgs(customer.Name, customer.Email, customer.Phone, sqlmock.AnyArg(), customer.UpdatedBy, customer.ID).
 					WillReturnError(gorm.ErrInvalidDB)
 				s.mock.ExpectRollback()
 			},
