@@ -56,6 +56,28 @@ func (s *CustomerServiceServer) CreateCustomer(ctx context.Context, req *pb.Crea
 		UpdatedBy: req.CreatedBy,
 	}
 
+	// Check if customer already exists by email
+	existingCustomer, err := s.customerService.GetCustomerByEmail(req.Email)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		log.Errorf("failed to get customer by email: %v", err)
+		return nil, status.Error(codes.Internal, "failed to get customer by email")
+	}
+	if existingCustomer != nil {
+		log.Errorf("customer already exists")
+		return nil, status.Error(codes.AlreadyExists, "customer already exists")
+	}
+
+	// Check if customer already exists by phone
+	existingCustomer, err = s.customerService.GetCustomerByPhone(req.Phone)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		log.Errorf("failed to get customer by phone: %v", err)
+		return nil, status.Error(codes.Internal, "failed to get customer by phone")
+	}
+	if existingCustomer != nil {
+		log.Errorf("customer already exists")
+		return nil, status.Error(codes.AlreadyExists, "customer already exists")
+	}
+
 	// Call service layer
 	if err := s.customerService.CreateCustomer(customer); err != nil {
 		log.Errorf("failed to create customer: %v", err)
@@ -169,6 +191,32 @@ func (s *CustomerServiceServer) UpdateCustomer(ctx context.Context, req *pb.Upda
 		}
 		log.Errorf("failed to get customer: %v", err)
 		return nil, status.Error(codes.Internal, "failed to get customer")
+	}
+
+	// Check if email is already in use
+	existingCustomerByEmail, err := s.customerService.GetCustomerByEmail(req.Email)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		log.Errorf("failed to get customer by email: %v", err)
+		return nil, status.Error(codes.Internal, "failed to get customer by email")
+	}
+	if existingCustomerByEmail != nil {
+		if existingCustomerByEmail.ID != existingCustomer.ID {
+			log.Errorf("email already in use")
+			return nil, status.Error(codes.AlreadyExists, "email already in use")
+		}
+	}
+
+	// Check if phone is already in use
+	existingCustomerByPhone, err := s.customerService.GetCustomerByPhone(req.Phone)
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		log.Errorf("failed to get customer by phone: %v", err)
+		return nil, status.Error(codes.Internal, "failed to get customer by phone")
+	}
+	if existingCustomerByPhone != nil {
+		if existingCustomerByPhone.ID != existingCustomer.ID {
+			log.Errorf("phone already in use")
+			return nil, status.Error(codes.AlreadyExists, "phone already in use")
+		}
 	}
 
 	// Update customer fields

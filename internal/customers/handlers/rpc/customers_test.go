@@ -45,6 +45,10 @@ func (s *CustomerServiceServerTestSuite) TestCreateCustomer() {
 				CreatedBy: "system",
 			},
 			mockSetup: func() {
+				s.mockService.EXPECT().GetCustomerByEmail(mock.AnythingOfType("string")).
+					Return(nil, gorm.ErrRecordNotFound).Once()
+				s.mockService.EXPECT().GetCustomerByPhone(mock.AnythingOfType("string")).
+					Return(nil, gorm.ErrRecordNotFound).Once()
 				s.mockService.EXPECT().CreateCustomer(mock.AnythingOfType("*entitites.Customer")).
 					RunAndReturn(func(customer *entitites.Customer) error {
 						customer.ID = 1
@@ -112,6 +116,74 @@ func (s *CustomerServiceServerTestSuite) TestCreateCustomer() {
 			validate:      func(t *testing.T, response *pb.CreateCustomerResponse) {},
 		},
 		{
+			name: "error get customer by email",
+			request: &pb.CreateCustomerRequest{
+				Name:      "John Doe",
+				Email:     "john@example.com",
+				Phone:     "+1234567890",
+				CreatedBy: "system",
+			},
+			mockSetup: func() {
+				s.mockService.EXPECT().GetCustomerByEmail(mock.AnythingOfType("string")).
+					Return(nil, assert.AnError).Once()
+			},
+			expectedError: codes.Internal,
+			validate:      func(t *testing.T, response *pb.CreateCustomerResponse) {},
+		},
+		{
+			name: "error customer already exists by email",
+			request: &pb.CreateCustomerRequest{
+				Name:      "John Doe",
+				Email:     "john@example.com",
+				Phone:     "+1234567890",
+				CreatedBy: "system",
+			},
+			mockSetup: func() {
+				s.mockService.EXPECT().GetCustomerByEmail(mock.AnythingOfType("string")).
+					Return(&entitites.Customer{
+						ID: 1,
+					}, nil).Once()
+			},
+			expectedError: codes.AlreadyExists,
+			validate:      func(t *testing.T, response *pb.CreateCustomerResponse) {},
+		},
+		{
+			name: "error get customer by phone",
+			request: &pb.CreateCustomerRequest{
+				Name:      "John Doe",
+				Email:     "john@example.com",
+				Phone:     "+1234567890",
+				CreatedBy: "system",
+			},
+			mockSetup: func() {
+				s.mockService.EXPECT().GetCustomerByEmail(mock.AnythingOfType("string")).
+					Return(nil, gorm.ErrRecordNotFound).Once()
+				s.mockService.EXPECT().GetCustomerByPhone(mock.AnythingOfType("string")).
+					Return(nil, assert.AnError).Once()
+			},
+			expectedError: codes.Internal,
+			validate:      func(t *testing.T, response *pb.CreateCustomerResponse) {},
+		},
+		{
+			name: "error customer already exists by phone",
+			request: &pb.CreateCustomerRequest{
+				Name:      "John Doe",
+				Email:     "john@example.com",
+				Phone:     "+1234567890",
+				CreatedBy: "system",
+			},
+			mockSetup: func() {
+				s.mockService.EXPECT().GetCustomerByEmail(mock.AnythingOfType("string")).
+					Return(nil, gorm.ErrRecordNotFound).Once()
+				s.mockService.EXPECT().GetCustomerByPhone(mock.AnythingOfType("string")).
+					Return(&entitites.Customer{
+						ID: 1,
+					}, nil).Once()
+			},
+			expectedError: codes.AlreadyExists,
+			validate:      func(t *testing.T, response *pb.CreateCustomerResponse) {},
+		},
+		{
 			name: "service error",
 			request: &pb.CreateCustomerRequest{
 				Name:      "John Doe",
@@ -120,6 +192,10 @@ func (s *CustomerServiceServerTestSuite) TestCreateCustomer() {
 				CreatedBy: "system",
 			},
 			mockSetup: func() {
+				s.mockService.EXPECT().GetCustomerByEmail(mock.AnythingOfType("string")).
+					Return(nil, gorm.ErrRecordNotFound).Once()
+				s.mockService.EXPECT().GetCustomerByPhone(mock.AnythingOfType("string")).
+					Return(nil, gorm.ErrRecordNotFound).Once()
 				s.mockService.EXPECT().CreateCustomer(mock.AnythingOfType("*entitites.Customer")).
 					Return(assert.AnError).Once()
 			},
@@ -353,6 +429,10 @@ func (s *CustomerServiceServerTestSuite) TestUpdateCustomer() {
 						CreatedBy: "system",
 						UpdatedBy: "system",
 					}, nil).Once()
+				s.mockService.EXPECT().GetCustomerByEmail(mock.AnythingOfType("string")).
+					Return(nil, gorm.ErrRecordNotFound).Once()
+				s.mockService.EXPECT().GetCustomerByPhone(mock.AnythingOfType("string")).
+					Return(nil, gorm.ErrRecordNotFound).Once()
 				s.mockService.EXPECT().UpdateCustomer(mock.AnythingOfType("*entitites.Customer")).
 					Return(nil).Once()
 			},
@@ -460,6 +540,110 @@ func (s *CustomerServiceServerTestSuite) TestUpdateCustomer() {
 			validate:      func(t *testing.T, response *pb.UpdateCustomerResponse) {},
 		},
 		{
+			name: "get customer by id not found",
+			request: &pb.UpdateCustomerRequest{
+				Id:        1,
+				Name:      "John Doe",
+				Email:     "john@example.com",
+				Phone:     "+1234567890",
+				UpdatedBy: "system",
+			},
+			mockSetup: func() {
+				s.mockService.EXPECT().GetCustomerByID(uint(1)).
+					Return(nil, gorm.ErrRecordNotFound).Once()
+			},
+			expectedError: codes.NotFound,
+			validate:      func(t *testing.T, response *pb.UpdateCustomerResponse) {},
+		},
+		{
+			name: "get customer by email error",
+			request: &pb.UpdateCustomerRequest{
+				Id:        1,
+				Name:      "John Doe",
+				Email:     "john@example.com",
+				Phone:     "+1234567890",
+				UpdatedBy: "system",
+			},
+			mockSetup: func() {
+				s.mockService.EXPECT().GetCustomerByID(uint(1)).
+					Return(&entitites.Customer{
+						ID: 1,
+					}, nil).Once()
+				s.mockService.EXPECT().GetCustomerByEmail(mock.AnythingOfType("string")).
+					Return(nil, gorm.ErrInvalidDB).Once()
+			},
+			expectedError: codes.Internal,
+			validate:      func(t *testing.T, response *pb.UpdateCustomerResponse) {},
+		},
+		{
+			name: "customer already exists by email",
+			request: &pb.UpdateCustomerRequest{
+				Id:        1,
+				Name:      "John Doe",
+				Email:     "john@example.com",
+				Phone:     "+1234567890",
+				UpdatedBy: "system",
+			},
+			mockSetup: func() {
+				s.mockService.EXPECT().GetCustomerByID(uint(1)).
+					Return(&entitites.Customer{
+						ID: 1,
+					}, nil).Once()
+				s.mockService.EXPECT().GetCustomerByEmail(mock.AnythingOfType("string")).
+					Return(&entitites.Customer{
+						ID: 2,
+					}, nil).Once()
+			},
+			expectedError: codes.AlreadyExists,
+			validate:      func(t *testing.T, response *pb.UpdateCustomerResponse) {},
+		},
+		{
+			name: "get customer by phone error",
+			request: &pb.UpdateCustomerRequest{
+				Id:        1,
+				Name:      "John Doe",
+				Email:     "john@example.com",
+				Phone:     "+1234567890",
+				UpdatedBy: "system",
+			},
+			mockSetup: func() {
+				s.mockService.EXPECT().GetCustomerByID(uint(1)).
+					Return(&entitites.Customer{
+						ID: 1,
+					}, nil).Once()
+				s.mockService.EXPECT().GetCustomerByEmail(mock.AnythingOfType("string")).
+					Return(nil, gorm.ErrRecordNotFound).Once()
+				s.mockService.EXPECT().GetCustomerByPhone(mock.AnythingOfType("string")).
+					Return(nil, gorm.ErrInvalidDB).Once()
+			},
+			expectedError: codes.Internal,
+			validate:      func(t *testing.T, response *pb.UpdateCustomerResponse) {},
+		},
+		{
+			name: "customer already exists by phone",
+			request: &pb.UpdateCustomerRequest{
+				Id:        1,
+				Name:      "John Doe",
+				Email:     "john@example.com",
+				Phone:     "+1234567890",
+				UpdatedBy: "system",
+			},
+			mockSetup: func() {
+				s.mockService.EXPECT().GetCustomerByID(uint(1)).
+					Return(&entitites.Customer{
+						ID: 1,
+					}, nil).Once()
+				s.mockService.EXPECT().GetCustomerByEmail(mock.AnythingOfType("string")).
+					Return(nil, gorm.ErrRecordNotFound).Once()
+				s.mockService.EXPECT().GetCustomerByPhone(mock.AnythingOfType("string")).
+					Return(&entitites.Customer{
+						ID: 2,
+						}, nil).Once()
+			},
+			expectedError: codes.AlreadyExists,
+			validate:      func(t *testing.T, response *pb.UpdateCustomerResponse) {},
+		},
+		{
 			name: "update customer error",
 			request: &pb.UpdateCustomerRequest{
 				Id:        1,
@@ -473,6 +657,10 @@ func (s *CustomerServiceServerTestSuite) TestUpdateCustomer() {
 					Return(&entitites.Customer{
 						ID: 1,
 					}, nil).Once()
+				s.mockService.EXPECT().GetCustomerByEmail(mock.AnythingOfType("string")).
+					Return(nil, gorm.ErrRecordNotFound).Once()
+				s.mockService.EXPECT().GetCustomerByPhone(mock.AnythingOfType("string")).
+					Return(nil, gorm.ErrRecordNotFound).Once()
 				s.mockService.EXPECT().UpdateCustomer(mock.AnythingOfType("*entitites.Customer")).
 					Return(assert.AnError).Once()
 			},
